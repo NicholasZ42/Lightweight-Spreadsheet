@@ -1,4 +1,5 @@
-Lightweight Spreadsheet App
+# Lightweight Spreadsheet App
+
 • Save/Load from XML files, operator precedence, parentheses support, cell coloring
 
 • Utilized observer design pattern to promote efficient updating of cells 
