@@ -58,5 +58,22 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
 
             Assert.Null(spreadsheet.GetCell(-1, 2));
         }
+
+        /// <summary>
+        /// Tests getting an invalid cell in the spreadsheet.
+        /// </summary>
+        [Test]
+        [Timeout(1000)]
+        public void CircularReferenceTest()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+
+            spreadsheet.GetCell("A1").Text = "=B1";
+            spreadsheet.GetCell("B1").Text = "=A1";
+            spreadsheet.GetCell("C1").Text = "=A1";
+            Assert.AreEqual(spreadsheet.GetCell("A1").Value, "!(circular reference)");
+            Assert.AreEqual(spreadsheet.GetCell("B1").Value, "!(circular reference)");
+            Assert.AreEqual(spreadsheet.GetCell("C1").Value, "!(circular reference)");
+        }
     }
 }

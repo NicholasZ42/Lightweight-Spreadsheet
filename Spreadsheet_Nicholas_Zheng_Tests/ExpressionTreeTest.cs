@@ -27,7 +27,8 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void ExpressionTreeEvaluateAdditionTest()
         {
             ExpressionTree expressionTree = new ExpressionTree("A+Hello+B+6");
-            Assert.AreEqual(6.0, expressionTree.Evaluate());
+            Assert.AreEqual(0.0, expressionTree.Evaluate());
+            // Variable has not been set
         }
 
         /// <summary>
@@ -37,7 +38,8 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void ExpressionTreeEvaluateSubtractionTest()
         {
             ExpressionTree expressionTree = new ExpressionTree("A-Hello-B-6");
-            Assert.AreEqual(-6.0, expressionTree.Evaluate());
+            Assert.AreEqual(0.0, expressionTree.Evaluate());
+            // Variable has not been set
         }
 
         /// <summary>

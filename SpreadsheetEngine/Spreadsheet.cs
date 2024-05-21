@@ -23,6 +23,8 @@ namespace SpreadsheetEngine
 
         private const string BAD_REFERENCE = "!(bad reference)";
 
+        private const string CIRCULAR_REFERENCE = "!(circular reference)";
+
         /// <summary>
         /// 2-D array containing all cells in the spreadsheet.
         /// </summary>
@@ -429,7 +431,7 @@ namespace SpreadsheetEngine
             }
             else if (this.CircularReference(cell))
             {
-                cell.Value = "!(circular reference)";
+                cell.Value = CIRCULAR_REFERENCE;
                 return true;
             }
 
@@ -543,6 +545,11 @@ namespace SpreadsheetEngine
                     }
                 } else if (spreadsheetCell.Value == SELF_REFERENCE || spreadsheetCell.Value == BAD_REFERENCE)
                 {
+                    return;
+                } else if (spreadsheetCell.Value == CIRCULAR_REFERENCE) 
+                {
+                    // If the formula references a circular reference cycle, it is considered a circular reference
+                    res = true;
                     return;
                 }
 
