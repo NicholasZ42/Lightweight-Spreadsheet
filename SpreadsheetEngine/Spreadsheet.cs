@@ -606,7 +606,7 @@ namespace SpreadsheetEngine
             foreach (string c in cellNames)
             {
                 Cell spreadsheetCellInFormula = this.GetCell(c);
-                spreadsheetCellInFormula.FormulaChanged += cell.Formula_Changed; // Add parent to subscriber list.
+                spreadsheetCellInFormula.FormulaChanged += cell.Formula_Changed; // Subscribe to spreadsheetCellInFormula
             }
         }
 
