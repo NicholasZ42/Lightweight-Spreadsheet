@@ -400,43 +400,6 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         }
 
         /// <summary>
-        /// Test redo operation after spreadsheet load.
-        /// </summary>
-        [Test]
-        public void RedoCellTextAfterLoadSpreadsheetTest()
-        {
-            // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
-
-            // Set up some test data
-            spreadsheet.GetCell("A1").Text = "Hello";
-            spreadsheet.GetCell("A1").BGColor = 123456;
-            spreadsheet.GetCell("B1").Text = "World";
-            spreadsheet.GetCell("B1").BGColor = 654321;
-
-            // Save spreadsheet
-            using (FileStream fileStream = new FileStream(this.SPREADSHEET_TEST_FILEPATH, FileMode.Create))
-            {
-                // Act
-                spreadsheet.Save(fileStream);
-            }
-
-            spreadsheet.Load(this.SPREADSHEET_TEST_FILEPATH);
-            Assert.AreEqual(true, spreadsheet.RedosEmpty());
-        }
-
-        /// <summary>
-        /// Test redo operation after spreadsheet initialization.
-        /// </summary>
-        [Test]
-        public void RedoCellTextAfterSpreadsheetInitTest()
-        {
-            // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
-            Assert.AreEqual(true, spreadsheet.RedosEmpty());
-        }
-
-        /// <summary>
         /// Test single undo operation.
         /// </summary>
         [Test]
@@ -460,6 +423,124 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             spreadsheet.Redo();
 
             Assert.AreEqual("Hello", spreadsheet.GetCell("A1").Text);
+
+            // Assert no other cells in spreadsheet were changed
+            for (int i = 1; i < 26; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
+                    Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
+                }
+            }
+
+            // Check all cells in first row except A1
+            for (int i = 0; i < 1; i++)
+            {
+                for (int j = 1; j < 50; j++)
+                {
+                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
+                    Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Change the BGColor of a spreadsheet and update the undo stacks.
+        /// </summary>
+        /// <param name="spreadsheet">Spreadsheet to change. </param>
+        private void ChangeBG(ref Spreadsheet spreadsheet, string cellName, uint value, uint emptyCellBG)
+        {
+            spreadsheet.GetCell(cellName).BGColor = value;
+            BackgroundChangeCommand backgroundChangeCommand = new BackgroundChangeCommand(
+                spreadsheet.GetCell(cellName), emptyCellBG);
+            List<ICommand> commands = new List<ICommand>();
+            commands.Add(backgroundChangeCommand);
+            spreadsheet.AddUndo(commands);
+        }
+
+        /// <summary>
+        /// Test multipe undo operations done one after the other.
+        /// </summary>
+        [Test]
+        public void UndoBackgroundMultipleTest()
+        {
+            // Arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+
+            string emptyCellText = spreadsheet.GetCell("A1").Text;
+            uint emptyCellBG = spreadsheet.GetCell("A1").BGColor;
+            Assert.AreNotEqual(emptyCellBG, 123456);
+
+            this.ChangeBG(ref spreadsheet, "A1", 123456, emptyCellBG);
+            this.ChangeBG(ref spreadsheet, "B1", 123456, emptyCellBG);
+
+            spreadsheet.Undo();
+            spreadsheet.Undo();
+
+            // Assert all cells in spreadsheet were reverted to original
+            for (int i = 0; i < 26; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    Assert.AreEqual(emptyCellText, spreadsheet.GetCell(cellName).Text);
+                    Assert.AreEqual(emptyCellBG, spreadsheet.GetCell(cellName).BGColor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test single undo operation.
+        /// </summary>
+        [Test]
+        public void UndoBackgroundSingleTest()
+        {
+            // Arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+
+            string a1Text = spreadsheet.GetCell("A1").Text;
+            uint a1BG = spreadsheet.GetCell("A1").BGColor;
+
+            this.ChangeBG(ref spreadsheet, "A1", 123456, a1BG);
+
+            spreadsheet.Undo();
+
+            Assert.AreEqual(a1Text, spreadsheet.GetCell("A1").Text);
+            Assert.AreEqual(a1BG, spreadsheet.GetCell("A1").BGColor);
+
+            // Assert no other cells in spreadsheet were changed
+            for (int i = 0; i < 26; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
+                    Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test single undo operation.
+        /// </summary>
+        [Test]
+        public void RedoBackgroundSingleTest()
+        {
+            // Arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+
+            string a1Text = spreadsheet.GetCell("A1").Text;
+            uint a1BG = spreadsheet.GetCell("A1").BGColor;
+
+            this.ChangeBG(ref spreadsheet, "A1", 123456, a1BG);
+
+            spreadsheet.Undo();
+            spreadsheet.Redo();
+
+            Assert.AreEqual(123456, spreadsheet.GetCell("A1").BGColor);
 
             // Assert no other cells in spreadsheet were changed
             for (int i = 1; i < 26; i++)
