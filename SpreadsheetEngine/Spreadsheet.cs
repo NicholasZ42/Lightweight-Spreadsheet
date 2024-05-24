@@ -210,7 +210,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public void Undo()
         {
-            if (this.undos.Peek().Count != 0)
+            if (this.undos.Count != 0)
             {
                 List<ICommand> commands = this.undos.Pop();
 
