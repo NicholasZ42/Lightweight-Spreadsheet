@@ -4,11 +4,11 @@
 
 namespace Spreadsheet_Nicholas_Zheng_Tests
 {
-    using NUnit.Framework;
-    using SpreadsheetEngine;
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
+    using NUnit.Framework;
+    using SpreadsheetEngine;
 
     /// <summary>
     /// Tests the Spreadsheet class.
@@ -88,7 +88,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         }
 
         /// <summary>
-        /// Test for cases that should not cause circular references
+        /// Test for cases that should not cause circular references.
         /// </summary>
         /// <param name="cellTextPairs">In the format (cell, text) for every 2 elements. </param>
         [Test]
@@ -115,8 +115,8 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// <summary>
         /// Test for cases that should cause a bad reference.
         /// </summary>
-        /// <param name="cellName">cell name</param>
-        /// <param name="value">value</param>
+        /// <param name="cellName">cell name.</param>
+        /// <param name="value">value.</param>
         [Test]
         [Timeout(1000)]
         [TestCase("A1", "=B51")]
@@ -132,8 +132,8 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// <summary>
         /// Test for cases that should NOT cause a bad reference.
         /// </summary>
-        /// <param name="cellName">cell name</param>
-        /// <param name="value">value</param>
+        /// <param name="cellName">cell name.</param>
+        /// <param name="value">value.</param>
         [Test]
         [Timeout(1000)]
         [TestCase("A1", "=B50")]
@@ -151,8 +151,8 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// <summary>
         /// Test for cases that should cause a self reference.
         /// </summary>
-        /// <param name="cellName">cell name</param>
-        /// <param name="value">value</param>
+        /// <param name="cellName">cell name.</param>
+        /// <param name="value">value.</param>
         [Test]
         [Timeout(1000)]
         [TestCase("A1", "=A1")]
@@ -170,8 +170,8 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// <summary>
         /// Test for cases that should NOT cause a self reference.
         /// </summary>
-        /// <param name="cellName">cell name</param>
-        /// <param name="value">value</param>
+        /// <param name="cellName">cell name.</param>
+        /// <param name="value">value.</param>
         [Test]
         [Timeout(1000)]
         [TestCase("A1", "=A2")]
@@ -284,6 +284,20 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         }
 
         /// <summary>
+        /// Change the text of a spreadsheet and update the undo stacks.
+        /// </summary>
+        /// <param name="spreadsheet">Spreadsheet to change. </param>
+        private void ChangeText(ref Spreadsheet spreadsheet, string cellName, string newText, string emptyCellText)
+        {
+            spreadsheet.GetCell(cellName).Text = newText;
+            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
+                spreadsheet.GetCell(cellName), emptyCellText);
+            List<ICommand> commands = new List<ICommand>();
+            commands.Add(cellTextChangeCommand);
+            spreadsheet.AddUndo(commands);
+        }
+
+        /// <summary>
         /// Test multipe undo operations done one after the other.
         /// </summary>
         [Test]
@@ -295,21 +309,9 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             string emptyCellText = spreadsheet.GetCell("A1").Text;
             uint emptyCellBG = spreadsheet.GetCell("A1").BGColor;
 
-            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
-                spreadsheet.GetCell("A1"), emptyCellText);
-            List<ICommand> commands = new List<ICommand>();
-            commands.Add(cellTextChangeCommand);
-            spreadsheet.AddUndo(commands);
 
-            spreadsheet.GetCell("A1").Text = "Hello";
-
-            cellTextChangeCommand = new CellTextChangeCommand(
-                spreadsheet.GetCell("B1"), emptyCellText);
-            commands = new List<ICommand>();
-            commands.Add(cellTextChangeCommand);
-            spreadsheet.AddUndo(commands);
-
-            spreadsheet.GetCell("B1").Text = "Hello";
+            this.ChangeText(ref spreadsheet, "A1", "Hello", emptyCellText);
+            this.ChangeText(ref spreadsheet, "B1", "Hello", emptyCellText);
 
             spreadsheet.Undo();
             spreadsheet.Undo();
@@ -322,7 +324,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 0; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(emptyCellText, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(emptyCellBG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -341,13 +343,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             string a1Text = spreadsheet.GetCell("A1").Text;
             uint a1BG = spreadsheet.GetCell("A1").BGColor;
 
-            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
-                spreadsheet.GetCell("A1"), a1Text);
-            List<ICommand> commands = new List<ICommand>();
-            commands.Add(cellTextChangeCommand);
-            spreadsheet.AddUndo(commands);
-
-            spreadsheet.GetCell("A1").Text = "Hello";
+            this.ChangeText(ref spreadsheet, "A1", "Hello", a1Text);
 
             spreadsheet.Undo();
 
@@ -359,7 +355,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 0; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -411,13 +407,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             string a1Text = spreadsheet.GetCell("A1").Text;
             uint a1BG = spreadsheet.GetCell("A1").BGColor;
 
-            spreadsheet.GetCell("A1").Text = "Hello";
-
-            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
-               spreadsheet.GetCell("A1"), a1Text);
-            List<ICommand> commands = new List<ICommand>();
-            commands.Add(cellTextChangeCommand);
-            spreadsheet.AddUndo(commands);
+            this.ChangeText(ref spreadsheet, "A1", "Hello", a1Text);
 
             spreadsheet.Undo();
             spreadsheet.Redo();
@@ -429,7 +419,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 0; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -440,7 +430,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 1; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -485,7 +475,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 0; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(emptyCellText, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(emptyCellBG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -516,7 +506,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 0; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -524,7 +514,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         }
 
         /// <summary>
-        /// Test single undo operation.
+        /// Test single redo operation.
         /// </summary>
         [Test]
         public void RedoBackgroundSingleTest()
@@ -547,7 +537,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 0; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
@@ -558,7 +548,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             {
                 for (int j = 1; j < 50; j++)
                 {
-                    string cellName = "" + (char)(i + (int)'A') + (j + 1).ToString();
+                    string cellName = string.Empty + (char)(i + (int)'A') + (j + 1).ToString();
                     Assert.AreEqual(a1Text, spreadsheet.GetCell(cellName).Text);
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
