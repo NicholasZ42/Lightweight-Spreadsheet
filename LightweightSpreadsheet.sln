@@ -1,13 +1,14 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet_Nicholas_Zheng", "Spreadsheet_Nicholas_Zheng\Spreadsheet_Nicholas_Zheng.csproj", "{7851314C-28AD-481A-97BF-3306D42EBEEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet_Nicholas_Zheng", "Spreadsheet_Nicholas_Zheng\Spreadsheet_Nicholas_Zheng.csproj", "{7851314C-28AD-481A-97BF-3306D42EBEEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet_Nicholas_Zheng_Tests", "Spreadsheet_Nicholas_Zheng_Tests\Spreadsheet_Nicholas_Zheng_Tests.csproj", "{3371E457-CE3D-4A22-81BD-679878DF140E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet_Nicholas_Zheng_Tests", "Spreadsheet_Nicholas_Zheng_Tests\Spreadsheet_Nicholas_Zheng_Tests.csproj", "{3371E457-CE3D-4A22-81BD-679878DF140E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetEngine", "SpreadsheetEngine\SpreadsheetEngine.csproj", "{5395B573-99FF-42FF-B22A-8B764B323779}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpreadsheetEngine", "SpreadsheetEngine\SpreadsheetEngine.csproj", "{5395B573-99FF-42FF-B22A-8B764B323779}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPIClient", "WebAPIClient\WebAPIClient.csproj", "{3CAC02C4-D36F-44D4-B5CD-1AB0AA9BE21F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +28,10 @@ Global
 		{5395B573-99FF-42FF-B22A-8B764B323779}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5395B573-99FF-42FF-B22A-8B764B323779}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5395B573-99FF-42FF-B22A-8B764B323779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CAC02C4-D36F-44D4-B5CD-1AB0AA9BE21F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CAC02C4-D36F-44D4-B5CD-1AB0AA9BE21F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CAC02C4-D36F-44D4-B5CD-1AB0AA9BE21F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CAC02C4-D36F-44D4-B5CD-1AB0AA9BE21F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

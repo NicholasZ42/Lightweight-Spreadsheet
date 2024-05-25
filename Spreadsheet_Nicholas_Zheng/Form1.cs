@@ -5,10 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Windows.Forms;
 using SpreadsheetEngine;
+using WebAPIClient;
 
 namespace Spreadsheet_Nicholas_Zheng
 {
@@ -101,30 +105,54 @@ namespace Spreadsheet_Nicholas_Zheng
         /// </summary>
         /// <param name="sender"> N/A. </param>
         /// <param name="e"> Unknown. </param>
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            // Set 50 cells with string "Hello World"
-            string s = "Hello World";
-            Random random = new Random();
-            for (int i = 0; i < 50; i++)
-            {
-                int randomRow = random.Next(0, 50);
-                int randomCol = random.Next(2, 26);
-                this.spreadsheet.GetCell(randomRow, randomCol).Text = s;
-            }
+            // Sample client creation
+            HttpClient client = new ();
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+            client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
-            // Set the text in every cell in column B to “This is cell B#”, where #
-            // number is the row number for the cell.
-            for (int i = 1; i <= 50; ++i)
-            {
-                this.spreadsheet.GetCell(i - 1, 1).Text = $"This is cell B{i}";
-            }
+            WebClient webClient = new WebClient(client);
 
-            // Set the text in every cell in column A to “=B#”, where ‘#’ is the row number of the
-            // cell.
-            for (int i = 1; i <= 50; ++i)
+            var repositories = await webClient.ProcessRepositoriesAsync();
+
+            // Set row descriptors
+            this.spreadsheet.GetCell(0, 0).Text = "Name";
+            this.spreadsheet.GetCell(0, 1).Text = "Homepage";
+            this.spreadsheet.GetCell(0, 2).Text = "GitHubHomeUrl";
+            this.spreadsheet.GetCell(0, 3).Text = "Description";
+            this.spreadsheet.GetCell(0, 4).Text = "Watchers";
+            this.spreadsheet.GetCell(0, 5).Text = "LastPush";
+
+            if (repositories.Count < 49)
             {
-                this.spreadsheet.GetCell(i - 1, 0).Text = $"=B{i}";
+                int rowInd = 1;
+                foreach (var repo in repositories)
+                {
+                    this.spreadsheet.GetCell(rowInd, 0).Text = repo.Name ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 1).Text = repo.Homepage?.ToString() ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 2).Text = repo.GitHubHomeUrl?.ToString() ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 3).Text = repo.Description ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 4).Text = repo.Watchers.ToString() ?? "0";
+                    this.spreadsheet.GetCell(rowInd, 5).Text = repo.LastPush.ToLongDateString() ?? string.Empty;
+                    rowInd++;
+                }
+            } else
+            {
+                int rowInd = 1;
+                for (int i = 0; i < 49; i++)
+                {
+                    var repo = repositories[i];
+                    this.spreadsheet.GetCell(rowInd, 0).Text = repo.Name ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 1).Text = repo.Homepage?.ToString() ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 2).Text = repo.GitHubHomeUrl?.ToString() ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 3).Text = repo.Description ?? string.Empty;
+                    this.spreadsheet.GetCell(rowInd, 4).Text = repo.Watchers.ToString() ?? "0";
+                    this.spreadsheet.GetCell(rowInd, 5).Text = repo.LastPush.ToLongDateString() ?? string.Empty;
+                    rowInd++;
+                }
             }
         }
 
