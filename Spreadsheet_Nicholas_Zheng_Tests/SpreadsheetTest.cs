@@ -22,7 +22,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [Test]
         public void GetCellNameParameterNonNullTest()
         {
-            Spreadsheet spreadsheet = new Spreadsheet(10, 10);
+            Spreadsheet spreadsheet = new (10, 10);
 
             Assert.NotNull(spreadsheet.GetCell("A1"));
         }
@@ -33,7 +33,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [Test]
         public void GetCellNameParameterNullTest()
         {
-            Spreadsheet spreadsheet = new Spreadsheet(10, 10);
+            Spreadsheet spreadsheet = new (10, 10);
 
             Assert.Null(spreadsheet.GetCell("a1"));
         }
@@ -44,7 +44,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [Test]
         public void GetCellIndexParameterNonNullTest()
         {
-            Spreadsheet spreadsheet = new Spreadsheet(10, 10);
+            Spreadsheet spreadsheet = new (10, 10);
 
             Assert.NotNull(spreadsheet.GetCell(0, 2));
         }
@@ -55,7 +55,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [Test]
         public void GetCellIndexParameterNullTest()
         {
-            Spreadsheet spreadsheet = new Spreadsheet(10, 10);
+            Spreadsheet spreadsheet = new (10, 10);
 
             Assert.Null(spreadsheet.GetCell(-1, 2));
         }
@@ -68,11 +68,11 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// <param name="cellTextPairs">In the format (cell, text) for every 2 elements. </param>
         [Test]
         [Timeout(1000)]
-        [TestCase(new object[] { "A1", "=B1", "B1", "=A1", "C1", "=A1" })]
-        [TestCase(new object[] { "A1", "=B1", "B1", "=A2", "A2", "=B2", "B2", "=B1" })]
+        [TestCase(["A1", "=B1", "B1", "=A1", "C1", "=A1"])]
+        [TestCase(["A1", "=B1", "B1", "=A2", "A2", "=B2", "B2", "=B1"])]
         public void CircularReferenceTest(params string[] cellTextPairs)
         {
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
             for (int i = 0; i < cellTextPairs.Length; i += 2)
             {
                 string cell = cellTextPairs[i];
@@ -93,11 +93,11 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// <param name="cellTextPairs">In the format (cell, text) for every 2 elements. </param>
         [Test]
         [Timeout(1000)]
-        [TestCase(new object[] { "A1", "=B1", "C1", "=A1" })]
-        [TestCase(new object[] { "A1", "=B1", "B1", "=A2", "A2", "=B2" })]
+        [TestCase(["A1", "=B1", "C1", "=A1"])]
+        [TestCase(["A1", "=B1", "B1", "=A2", "A2", "=B2"])]
         public void CircularReferenceNonPositiveTest(params string[] cellTextPairs)
         {
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
             for (int i = 0; i < cellTextPairs.Length; i += 2)
             {
                 string cell = cellTextPairs[i];
@@ -124,7 +124,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [TestCase("A1", "=B-51")]
         public void BadReferenceTest(string cellName, string value)
         {
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
             spreadsheet.GetCell(cellName).Text = value;
             Assert.AreEqual(spreadsheet.GetCell(cellName).Value, "!(bad reference)");
         }
@@ -143,7 +143,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [TestCase("A1", "=E25")]
         public void BadReferenceNonPositiveTest(string cellName, string value)
         {
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
             spreadsheet.GetCell(cellName).Text = value;
             Assert.AreNotEqual(spreadsheet.GetCell(cellName).Value, "!(bad reference)");
         }
@@ -162,7 +162,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [TestCase("E25", "=E25")]
         public void SelfReferenceTest(string cellName, string value)
         {
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
             spreadsheet.GetCell(cellName).Text = value;
             Assert.AreEqual(spreadsheet.GetCell(cellName).Value, "!(self reference)");
         }
@@ -181,7 +181,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [TestCase("E25", "=E2")]
         public void SelfReferenceNonPositiveTest(string cellName, string value)
         {
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
             spreadsheet.GetCell(cellName).Text = value;
             Assert.AreNotEqual(spreadsheet.GetCell(cellName).Value, "!(self reference)");
         }
@@ -193,7 +193,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void SaveSpreadsheetTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             // Set up some test data
             spreadsheet.GetCell("A1").Text = "Hello";
@@ -201,15 +201,15 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             spreadsheet.GetCell("B1").Text = "World";
             spreadsheet.GetCell("B1").BGColor = 654321;
 
-            using (FileStream fileStream = new FileStream("./Spreadsheet_Nicholas_Zheng/bin/Debug/spreadsheetTest.xml", FileMode.Create))
+            using (FileStream fileStream = new (this.SPREADSHEET_TEST_FILEPATH, FileMode.Create))
             {
                 // Act
                 spreadsheet.Save(fileStream);
             }
 
-            using (FileStream fileStream = new FileStream("./Spreadsheet_Nicholas_Zheng/bin/Debug/spreadsheetTest.xml", FileMode.Open))
+            using (FileStream fileStream = new (this.SPREADSHEET_TEST_FILEPATH, FileMode.Open))
             {
-                XmlDocument doc = new XmlDocument();
+                XmlDocument doc = new ();
                 doc.Load(fileStream);
 
                 XmlElement root = doc.DocumentElement;
@@ -237,7 +237,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             }
         }
 
-        private string SPREADSHEET_TEST_FILEPATH = "./Spreadsheet_Nicholas_Zheng/bin/Debug/spreadsheetTest.xml";
+        private readonly string SPREADSHEET_TEST_FILEPATH = "../spreadsheetTest.xml";
 
         /// <summary>
         /// Loading a spreadsheet with valid data.
@@ -246,7 +246,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void LoadSpreadsheetTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             // Set up some test data
             spreadsheet.GetCell("A1").Text = "Hello";
@@ -258,7 +258,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             uint c1BG = spreadsheet.GetCell("C1").BGColor;
 
             // Save spreadsheet
-            using (FileStream fileStream = new FileStream(this.SPREADSHEET_TEST_FILEPATH, FileMode.Create))
+            using (FileStream fileStream = new (this.SPREADSHEET_TEST_FILEPATH, FileMode.Create))
             {
                 // Act
                 spreadsheet.Save(fileStream);
@@ -290,13 +290,13 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void UndoCellTextMultipleTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             string emptyCellText = spreadsheet.GetCell("A1").Text;
             uint emptyCellBG = spreadsheet.GetCell("A1").BGColor;
 
-            this.ChangeText(ref spreadsheet, "A1", "Hello", emptyCellText);
-            this.ChangeText(ref spreadsheet, "B1", "Hello", emptyCellText);
+            ChangeText(ref spreadsheet, "A1", "Hello", emptyCellText);
+            ChangeText(ref spreadsheet, "B1", "Hello", emptyCellText);
 
             spreadsheet.Undo();
             spreadsheet.Undo();
@@ -323,12 +323,12 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void UndoCellTextSingleTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             string a1Text = spreadsheet.GetCell("A1").Text;
             uint a1BG = spreadsheet.GetCell("A1").BGColor;
 
-            this.ChangeText(ref spreadsheet, "A1", "Hello", a1Text);
+            ChangeText(ref spreadsheet, "A1", "Hello", a1Text);
 
             spreadsheet.Undo();
 
@@ -354,7 +354,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void UndoCellTextAfterLoadSpreadsheetTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             // Set up some test data
             spreadsheet.GetCell("A1").Text = "Hello";
@@ -363,7 +363,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             spreadsheet.GetCell("B1").BGColor = 654321;
 
             // Save spreadsheet
-            using (FileStream fileStream = new FileStream(this.SPREADSHEET_TEST_FILEPATH, FileMode.Create))
+            using (FileStream fileStream = new (this.SPREADSHEET_TEST_FILEPATH, FileMode.Create))
             {
                 // Act
                 spreadsheet.Save(fileStream);
@@ -387,12 +387,12 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void RedoCellTextSingleTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             string a1Text = spreadsheet.GetCell("A1").Text;
             uint a1BG = spreadsheet.GetCell("A1").BGColor;
 
-            this.ChangeText(ref spreadsheet, "A1", "Hello", a1Text);
+            ChangeText(ref spreadsheet, "A1", "Hello", a1Text);
 
             spreadsheet.Undo();
             spreadsheet.Redo();
@@ -426,13 +426,12 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// Change the text of a spreadsheet and update the undo stacks.
         /// </summary>
         /// <param name="spreadsheet">Spreadsheet to change. </param>
-        private void ChangeText(ref Spreadsheet spreadsheet, string cellName, string newText, string emptyCellText)
+        private static void ChangeText(ref Spreadsheet spreadsheet, string cellName, string newText, string emptyCellText)
         {
             spreadsheet.GetCell(cellName).Text = newText;
-            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
+            CellTextChangeCommand cellTextChangeCommand = new (
                 spreadsheet.GetCell(cellName), emptyCellText);
-            List<ICommand> commands = new List<ICommand>();
-            commands.Add(cellTextChangeCommand);
+            List<ICommand> commands = [cellTextChangeCommand];
             spreadsheet.AddUndo(commands);
         }
 
@@ -443,14 +442,14 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void UndoBackgroundMultipleTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             string emptyCellText = spreadsheet.GetCell("A1").Text;
             uint emptyCellBG = spreadsheet.GetCell("A1").BGColor;
             Assert.AreNotEqual(emptyCellBG, 123456);
 
-            this.ChangeBG(ref spreadsheet, "A1", 123456, emptyCellBG);
-            this.ChangeBG(ref spreadsheet, "B1", 123456, emptyCellBG);
+            ChangeBG(ref spreadsheet, "A1", 123456, emptyCellBG);
+            ChangeBG(ref spreadsheet, "B1", 123456, emptyCellBG);
 
             spreadsheet.Undo();
             spreadsheet.Undo();
@@ -474,12 +473,12 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void UndoBackgroundSingleTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             string a1Text = spreadsheet.GetCell("A1").Text;
             uint a1BG = spreadsheet.GetCell("A1").BGColor;
 
-            this.ChangeBG(ref spreadsheet, "A1", 123456, a1BG);
+            ChangeBG(ref spreadsheet, "A1", 123456, a1BG);
 
             spreadsheet.Undo();
 
@@ -505,12 +504,12 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         public void RedoBackgroundSingleTest()
         {
             // Arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             string a1Text = spreadsheet.GetCell("A1").Text;
             uint a1BG = spreadsheet.GetCell("A1").BGColor;
 
-            this.ChangeBG(ref spreadsheet, "A1", 123456, a1BG);
+            ChangeBG(ref spreadsheet, "A1", 123456, a1BG);
 
             spreadsheet.Undo();
             spreadsheet.Redo();
@@ -544,13 +543,12 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         /// Change the BGColor of a spreadsheet and update the undo stacks.
         /// </summary>
         /// <param name="spreadsheet">Spreadsheet to change. </param>
-        private void ChangeBG(ref Spreadsheet spreadsheet, string cellName, uint value, uint emptyCellBG)
+        private static void ChangeBG(ref Spreadsheet spreadsheet, string cellName, uint value, uint emptyCellBG)
         {
             spreadsheet.GetCell(cellName).BGColor = value;
-            BackgroundChangeCommand backgroundChangeCommand = new BackgroundChangeCommand(
+            BackgroundChangeCommand backgroundChangeCommand = new (
                 spreadsheet.GetCell(cellName), emptyCellBG);
-            List<ICommand> commands = new List<ICommand>();
-            commands.Add(backgroundChangeCommand);
+            List<ICommand> commands = [backgroundChangeCommand];
             spreadsheet.AddUndo(commands);
         }
     }
