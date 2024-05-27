@@ -284,20 +284,6 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         }
 
         /// <summary>
-        /// Change the text of a spreadsheet and update the undo stacks.
-        /// </summary>
-        /// <param name="spreadsheet">Spreadsheet to change. </param>
-        private void ChangeText(ref Spreadsheet spreadsheet, string cellName, string newText, string emptyCellText)
-        {
-            spreadsheet.GetCell(cellName).Text = newText;
-            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
-                spreadsheet.GetCell(cellName), emptyCellText);
-            List<ICommand> commands = new List<ICommand>();
-            commands.Add(cellTextChangeCommand);
-            spreadsheet.AddUndo(commands);
-        }
-
-        /// <summary>
         /// Test multipe undo operations done one after the other.
         /// </summary>
         [Test]
@@ -308,7 +294,6 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
 
             string emptyCellText = spreadsheet.GetCell("A1").Text;
             uint emptyCellBG = spreadsheet.GetCell("A1").BGColor;
-
 
             this.ChangeText(ref spreadsheet, "A1", "Hello", emptyCellText);
             this.ChangeText(ref spreadsheet, "B1", "Hello", emptyCellText);
@@ -438,16 +423,16 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         }
 
         /// <summary>
-        /// Change the BGColor of a spreadsheet and update the undo stacks.
+        /// Change the text of a spreadsheet and update the undo stacks.
         /// </summary>
         /// <param name="spreadsheet">Spreadsheet to change. </param>
-        private void ChangeBG(ref Spreadsheet spreadsheet, string cellName, uint value, uint emptyCellBG)
+        private void ChangeText(ref Spreadsheet spreadsheet, string cellName, string newText, string emptyCellText)
         {
-            spreadsheet.GetCell(cellName).BGColor = value;
-            BackgroundChangeCommand backgroundChangeCommand = new BackgroundChangeCommand(
-                spreadsheet.GetCell(cellName), emptyCellBG);
+            spreadsheet.GetCell(cellName).Text = newText;
+            CellTextChangeCommand cellTextChangeCommand = new CellTextChangeCommand(
+                spreadsheet.GetCell(cellName), emptyCellText);
             List<ICommand> commands = new List<ICommand>();
-            commands.Add(backgroundChangeCommand);
+            commands.Add(cellTextChangeCommand);
             spreadsheet.AddUndo(commands);
         }
 
@@ -553,6 +538,20 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
             }
+        }
+
+        /// <summary>
+        /// Change the BGColor of a spreadsheet and update the undo stacks.
+        /// </summary>
+        /// <param name="spreadsheet">Spreadsheet to change. </param>
+        private void ChangeBG(ref Spreadsheet spreadsheet, string cellName, uint value, uint emptyCellBG)
+        {
+            spreadsheet.GetCell(cellName).BGColor = value;
+            BackgroundChangeCommand backgroundChangeCommand = new BackgroundChangeCommand(
+                spreadsheet.GetCell(cellName), emptyCellBG);
+            List<ICommand> commands = new List<ICommand>();
+            commands.Add(backgroundChangeCommand);
+            spreadsheet.AddUndo(commands);
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         {
             ExpressionTree expressionTree = new ExpressionTree("A+Hello+B+6");
             Assert.AreEqual(0.0, expressionTree.Evaluate());
+
             // Variable has not been set
         }
 
@@ -39,6 +40,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         {
             ExpressionTree expressionTree = new ExpressionTree("A-Hello-B-6");
             Assert.AreEqual(0.0, expressionTree.Evaluate());
+
             // Variable has not been set
         }
 

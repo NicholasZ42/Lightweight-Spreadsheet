@@ -16,6 +16,7 @@ using WebAPIClient;
 
 namespace Spreadsheet_Nicholas_Zheng
 {
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     /// <summary>
     /// Form to display a spreadsheet.
     /// </summary>
@@ -139,7 +140,8 @@ namespace Spreadsheet_Nicholas_Zheng
                     this.spreadsheet.GetCell(rowInd, 5).Text = repo.LastPush.ToLongDateString() ?? string.Empty;
                     rowInd++;
                 }
-            } else
+            }
+            else
             {
                 int rowInd = 1;
                 for (int i = 0; i < 49; i++)
