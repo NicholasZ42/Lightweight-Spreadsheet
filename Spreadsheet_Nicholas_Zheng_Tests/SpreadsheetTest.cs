@@ -6,6 +6,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Xml;
     using NUnit.Framework;
     using SpreadsheetEngine;
@@ -17,47 +18,94 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
     public class SpreadsheetTest
     {
         /// <summary>
-        /// Tests getting a valid cell in the spreadsheet.
+        /// Tests getting an invalid cell.
         /// </summary>
+        /// <param name="cellName">String representation of a cell name. Ex: "A1". </param>
         [Test]
-        public void GetCellNameParameterNonNullTest()
+        [TestCase("A1")]
+        [TestCase("J10")]
+        [TestCase("B1")]
+        public void GetCellNameParameterNonNullTest(string cellName)
         {
             Spreadsheet spreadsheet = new (10, 10);
 
-            Assert.NotNull(spreadsheet.GetCell("A1"));
+            Assert.NotNull(spreadsheet.GetCell(cellName));
         }
 
         /// <summary>
-        /// Tests getting an invalid cell in the spreadsheet.
+        /// Tests getting an invalid cell.
         /// </summary>
+        /// <param name="cellName">String representation of a cell name. Ex: "A1". </param>
         [Test]
-        public void GetCellNameParameterNullTest()
+        [TestCase("a1")]
+        [TestCase("z10")]
+        [TestCase("aa1")]
+        public void GetCellNameParameterNullTest(string cellName)
         {
             Spreadsheet spreadsheet = new (10, 10);
 
-            Assert.Null(spreadsheet.GetCell("a1"));
+            Assert.Null(spreadsheet.GetCell(cellName));
+        }
+
+
+        /// <summary>
+        /// Tests getting valid cells.
+        /// </summary>
+        /// <param name="row">Row in spreadsheet.</param>
+        /// <param name="col">Column in spreadsheet. </param>
+        [Test]
+        [TestCase(9, 9)]
+        [TestCase(0, 0)]
+        [TestCase(5, 5)]
+        public void GetCellIndexParameterNonNullTest(int row, int col)
+        {
+            Spreadsheet spreadsheet = new (10, 10);
+
+            Assert.NotNull(spreadsheet.GetCell(row, col));
         }
 
         /// <summary>
-        /// Tests getting a valid cell in the spreadsheet.
+        /// Tests getting invalid cells.
         /// </summary>
+        /// <param name="row">Row in spreadsheet.</param>
+        /// <param name="col">Column in spreadsheet. </param>
         [Test]
-        public void GetCellIndexParameterNonNullTest()
+        [TestCase(-1, 2)]
+        [TestCase(11, 2)]
+        [TestCase(1, 12)]
+        [TestCase(1, -1)]
+        [TestCase(1, 10)]
+        public void GetCellIndexParameterNullTest(int row, int col)
         {
             Spreadsheet spreadsheet = new (10, 10);
 
-            Assert.NotNull(spreadsheet.GetCell(0, 2));
+            Assert.Null(spreadsheet.GetCell(row, col));
         }
 
         /// <summary>
-        /// Tests getting an invalid cell in the spreadsheet.
+        /// Test ComputeFormula indirectly by having cells reference each other.
+        /// Test case 1: C1 references multiple cells.
+        /// Test case 2: C1 references multiple cells with bad or self references.
         /// </summary>
+        /// <param name="cellTextPairs">In the format (cell, text) for every 2 elements. </param>
         [Test]
-        public void GetCellIndexParameterNullTest()
+        [Timeout(1000)]
+        [TestCase(["D1", "=10", "D2", "=10", "C1", "=D1+D2", "20"])]
+        [TestCase(["D1", "=D1", "D2", "=DD1", "C1", "=D1+D2", null])]
+        public void ComputeFormulaTest(params string[] cellTextPairs)
         {
-            Spreadsheet spreadsheet = new (10, 10);
+            Spreadsheet spreadsheet = new (50, 26);
 
-            Assert.Null(spreadsheet.GetCell(-1, 2));
+            for (int i = 0; i < cellTextPairs.Length - 1; i += 2)
+            {
+                string cell = cellTextPairs[i];
+                string text = cellTextPairs[i + 1];
+                spreadsheet.GetCell(cell).Text = text;
+            }
+
+            string c = cellTextPairs[cellTextPairs.Length - 3];
+            string expected = cellTextPairs[cellTextPairs.Length - 1];
+            Assert.AreEqual(expected, spreadsheet.GetCell(c).Value);
         }
 
         /// <summary>
@@ -537,6 +585,65 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
                     Assert.AreEqual(a1BG, spreadsheet.GetCell(cellName).BGColor);
                 }
             }
+        }
+
+        /// <summary>
+        /// Tests to cover the GetTopUndoCommandTitle method.
+        /// </summary>
+        /// <param name="expectedTitle">For when the method is called.</param>
+        /// <param name="commandTitles"> Which type of commands to add. </param>
+        [TestCase(null, new string[] { })]
+        [TestCase("Background change", new string[] { "Background change" })]
+        public void GetTopUndoCommandTitleTest(string expectedTitle, string[] commandTitles)
+        {
+            Spreadsheet spreadsheet = new (50, 26);
+
+            var commands = commandTitles.Select(title =>
+                title == "Background change"
+                    ? (ICommand)new BackgroundChangeCommand(null, 123456)
+                    : new CellTextChangeCommand(null, "Test"))
+                .ToList();
+
+            if (commands.Count > 0)
+            {
+                spreadsheet.AddUndo(commands);
+            }
+
+            // Act
+            var result = spreadsheet.GetTopUndoCommandTitle();
+
+            // Assert
+            Assert.AreEqual(expectedTitle, result);
+        }
+
+        /// <summary>
+        /// Tests to cover the GetTopRedoCommandTitle method.
+        /// </summary>
+        /// <param name="expectedTitle"> For calling the method. </param>
+        /// <param name="commandTitles"> Which commands to add. </param>
+        [TestCase(null, new string[] { })]
+        [TestCase("Background change", new string[] { "Background change" })]
+        public void GetTopRedoCommandTitleTest(string expectedTitle, string[] commandTitles)
+        {
+            Spreadsheet spreadsheet = new(50, 26);
+
+            var commands = commandTitles.Select(title =>
+                title == "Background change"
+                    ? (ICommand)new BackgroundChangeCommand(null, 123456)
+                    : new CellTextChangeCommand(null, "Test"))
+                .ToList();
+
+            if (commands.Count > 0)
+            {
+                spreadsheet.AddUndo(commands);
+                spreadsheet.Undo();
+            }
+
+            // Act
+            var result = spreadsheet.GetTopRedoCommandTitle();
+
+            // Assert
+            Assert.AreEqual(expectedTitle, result);
         }
 
         /// <summary>

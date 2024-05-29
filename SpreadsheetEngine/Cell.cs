@@ -145,14 +145,6 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
-        /// Resets the subscribers for the FormulaChanged event.
-        /// </summary>
-        public void ResetFormulaSubscribers()
-        {
-            this.FormulaChanged = delegate { };
-        }
-
-        /// <summary>
         /// Event handler for when the current cell's value has changed and it is being used in the formula of a different cell.
         /// Ex: The formula for a different cell is A1 + 1 and A1's value has changed. A1 is the current cell.
         /// </summary>

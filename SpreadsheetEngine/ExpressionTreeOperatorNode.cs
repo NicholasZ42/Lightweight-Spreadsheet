@@ -117,23 +117,5 @@ namespace SpreadsheetEngine
         {
             get => this.associativity;
         }
-
-        /// <summary>
-        /// Tries to evaluate the left and right sides.
-        /// </summary>
-        /// <param name="left"> Variable to hold left side value. </param>
-        /// <param name="right"> Variable to hold right side value. </param>
-        protected void TryEvaluate(ref double left, ref double right)
-        {
-            try
-            {
-                left = this.Left.Evaluate();
-                right = this.Right.Evaluate();
-            }
-            catch (VariableNotSetException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
     }
 }

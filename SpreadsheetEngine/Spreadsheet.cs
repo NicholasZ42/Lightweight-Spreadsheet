@@ -101,7 +101,7 @@ namespace SpreadsheetEngine
         /// <returns>  Title of the top command on the undo stack. </returns>
         public string GetTopUndoCommandTitle()
         {
-            if (this.undos.Peek().Count == 0)
+            if (this.undos.Count == 0)
             {
                 return null;
             }
@@ -124,7 +124,7 @@ namespace SpreadsheetEngine
         /// <returns>  Title of the top command on the redo stack. </returns>
         public string GetTopRedoCommandTitle()
         {
-            if (this.redos.Peek().Count == 0)
+            if (this.redos.Count == 0)
             {
                 return null;
             }

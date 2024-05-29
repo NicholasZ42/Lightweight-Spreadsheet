@@ -39,7 +39,7 @@ namespace SpreadsheetEngine
         public BackgroundChangeCommand(Cell cell, uint oldBG)
         {
             this.cell = cell;
-            this.currBG = cell.BGColor;
+            this.currBG = cell?.BGColor ?? 0xFFFFFFFF;
             this.oldBG = oldBG;
             this.title = "Background change";
         }
@@ -57,7 +57,10 @@ namespace SpreadsheetEngine
         /// </summary>
         public void Execute()
         {
-            this.cell.BGColor = this.currBG;
+            if (this.cell != null)
+            {
+                this.cell.BGColor = this.currBG;
+            }
         }
 
         /// <summary>
@@ -65,7 +68,10 @@ namespace SpreadsheetEngine
         /// </summary>
         public void Unexecute()
         {
-            this.cell.BGColor = this.oldBG;
+            if (this.cell != null)
+            {
+                this.cell.BGColor = this.oldBG;
+            }
         }
     }
 }
