@@ -47,7 +47,6 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
             Assert.Null(spreadsheet.GetCell(cellName));
         }
 
-
         /// <summary>
         /// Tests getting valid cells.
         /// </summary>
@@ -625,7 +624,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         [TestCase("Background change", new string[] { "Background change" })]
         public void GetTopRedoCommandTitleTest(string expectedTitle, string[] commandTitles)
         {
-            Spreadsheet spreadsheet = new(50, 26);
+            Spreadsheet spreadsheet = new (50, 26);
 
             var commands = commandTitles.Select(title =>
                 title == "Background change"

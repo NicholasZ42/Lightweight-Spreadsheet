@@ -543,10 +543,12 @@ namespace SpreadsheetEngine
                         res = true;
                         return;
                     }
-                } else if (spreadsheetCell.Value == SELF_REFERENCE || spreadsheetCell.Value == BAD_REFERENCE)
+                }
+                else if (spreadsheetCell.Value == SELF_REFERENCE || spreadsheetCell.Value == BAD_REFERENCE)
                 {
                     return;
-                } else if (spreadsheetCell.Value == CIRCULAR_REFERENCE) 
+                }
+                else if (spreadsheetCell.Value == CIRCULAR_REFERENCE)
                 {
                     // If the formula references a circular reference cycle, it is considered a circular reference
                     res = true;
