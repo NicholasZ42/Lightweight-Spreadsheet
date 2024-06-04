@@ -9,7 +9,7 @@
     using System.Threading.Tasks;
     using Moq;
     using NUnit.Framework;
-    using RichardSzalay.MockHttp;
+    using RichardSzalay.MockHttp; // Mock HTTP Library
     using WebAPIClient;
 
     /// <summary>
@@ -21,6 +21,7 @@
         /// <summary>
         /// Test ProcessRepositoriesAsync by mocking.
         /// </summary>
+        /// <returns><see cref="Task"/> Return for an async function with no return value. </returns>
         [Test]
         public async Task ProcessRepositoriesAsyncTestAsync()
         {

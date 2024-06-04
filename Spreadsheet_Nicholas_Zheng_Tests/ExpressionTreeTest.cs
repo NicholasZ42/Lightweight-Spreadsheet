@@ -11,6 +11,7 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+    using Moq;
     using NUnit.Framework;
     using SpreadsheetEngine;
 
@@ -40,8 +41,6 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
         {
             ExpressionTree expressionTree = new ExpressionTree("A-Hello-B-6");
             Assert.AreEqual(0.0, expressionTree.Evaluate());
-
-            // Variable has not been set
         }
 
         /// <summary>
@@ -478,6 +477,18 @@ namespace Spreadsheet_Nicholas_Zheng_Tests
                 "RemoveOuterParentheses",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.AreEqual("A21*B12+C9", methodInfo.Invoke(expression, new object[] { "((A21*B12+C9))" }));
+        }
+
+        /// <summary>
+        /// Test the moq test framework.
+        /// </summary>
+        [Test]
+        public void MoqTest()
+        {
+            var mock = new Mock<ExpressionTreeNode>();
+            mock.Setup(x => x.Evaluate()).Returns(5);
+            var mockObject = mock.Object;
+            Assert.AreEqual(5, mockObject.Evaluate());
         }
     }
 }
